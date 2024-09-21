@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"url-shortener/pkg/api/middlewares"
 	"url-shortener/pkg/api/shorten"
 	"url-shortener/pkg/api/users"
 	"url-shortener/pkg/db"
@@ -30,5 +31,5 @@ func main() {
 	http.HandleFunc("GET /{shortUrl}", shorten.ShortenGetOriginalURLHandler)
 
 	log.Println("Server started on port 8080")
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, middlewares.CorsMiddleware(http.DefaultServeMux)))
 }

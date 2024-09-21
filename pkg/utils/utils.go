@@ -51,11 +51,10 @@ func CompareHashAndPassword(hashedPassword, password string) error {
 }
 
 // Returns the user object based on the session ID cookie
-func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
+func GetUserInfoBySession(r *http.Request) Types.User {
 	cookie, cookieErr := r.Cookie("sessionId")
 
 	if cookieErr != nil {
-		w.WriteHeader(http.StatusUnauthorized)
 		return Types.User{}
 	}
 
@@ -65,7 +64,6 @@ func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
 
 	sessionStmt, sessionErr := db.GetDB().Prepare(sessionsQuery)
 	if sessionErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(sessionErr)
 		return Types.User{}
 	}
@@ -75,7 +73,6 @@ func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
 	sessionRowErr := sessionStmt.QueryRow(sessionId).Scan(&userId)
 
 	if sessionRowErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		return Types.User{}
 	}
 
@@ -84,7 +81,6 @@ func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
 	userStmt, userErr := db.GetDB().Prepare(userQuery)
 
 	if userErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(userErr)
 		return Types.User{}
 	}
@@ -94,7 +90,6 @@ func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
 	userRowErr := userStmt.QueryRow(userId).Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.ProfilePicture)
 
 	if userRowErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(userRowErr)
 		return Types.User{}
 	}

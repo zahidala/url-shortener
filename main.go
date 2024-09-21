@@ -27,6 +27,7 @@ func main() {
 	http.HandleFunc("POST /register", users.UserCreateHandler)
 
 	http.HandleFunc("POST /shorten", shorten.ShortenURLHandler)
+	http.HandleFunc("GET /{shortUrl}", shorten.ShortenGetOriginalURLHandler)
 
 	log.Println("Server started on port 8080")
 	log.Fatal(http.ListenAndServe(":"+port, nil))

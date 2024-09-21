@@ -3,6 +3,7 @@ package shorten
 import (
 	"log"
 	"net/http"
+	"strings"
 	"url-shortener/pkg/db"
 	"url-shortener/pkg/utils"
 
@@ -15,6 +16,11 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	if url == "" {
 		http.Error(w, "URL is required", http.StatusBadRequest)
 		return
+	}
+
+	// Ensure the URL starts with http:// or https://
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+		url = "http://" + url
 	}
 
 	verifier := UrlVerifier.NewVerifier()

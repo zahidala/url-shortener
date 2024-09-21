@@ -33,7 +33,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	findUserErr := userStmt.QueryRow(username).Scan(&userId, &hashedPassword)
 	switch {
 	case findUserErr == sql.ErrNoRows:
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, "User not found", http.StatusUnauthorized)
 		return
 	case findUserErr != nil:
 		http.Error(w, "Error querying database", http.StatusInternalServerError)
@@ -42,7 +42,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	compareErr := utils.CompareHashAndPassword(hashedPassword, password)
 	if compareErr != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		http.Error(w, "Invalid username/password", http.StatusUnauthorized)
 		return
 	}
 

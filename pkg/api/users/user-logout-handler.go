@@ -1,6 +1,7 @@
 package users
 
 import (
+	"log"
 	"net/http"
 	"time"
 	"url-shortener/pkg/db"
@@ -9,7 +10,7 @@ import (
 func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, cookieErr := r.Cookie("sessionId")
 	if cookieErr != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -19,7 +20,8 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionDeleteExecErr := db.PrepareAndExecute(sessionDeleteQuery, sessionId)
 	if sessionDeleteExecErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(sessionDeleteExecErr)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 

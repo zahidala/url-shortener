@@ -1,6 +1,7 @@
 package shorten
 
 import (
+	"log"
 	"net/http"
 	"url-shortener/pkg/db"
 	"url-shortener/pkg/utils"
@@ -12,7 +13,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
 
 	if url == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "URL is required", http.StatusBadRequest)
 		return
 	}
 
@@ -20,12 +21,14 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	ret, err := verifier.Verify(url)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
+		http.Error(w, "Error verifying URL", http.StatusBadRequest)
 		return
 	}
 
 	if !ret.IsURL {
-		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Not a valid URL")
+		http.Error(w, "Not a valid URL", http.StatusBadRequest)
 		return
 	}
 
@@ -41,7 +44,8 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 		user.ID,
 	)
 	if shortUrlAddExecErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(shortUrlAddExecErr)
+		http.Error(w, "Error saving shortened URL", http.StatusInternalServerError)
 		return
 	}
 

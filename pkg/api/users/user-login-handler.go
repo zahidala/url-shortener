@@ -18,7 +18,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userQuery := "SELECT id, password FROM users WHERE username = ?"
+	userQuery := "SELECT id, password FROM users WHERE username = $1"
 
 	userStmt, userErr := db.GetDB().Prepare(userQuery)
 	if userErr != nil {
@@ -47,7 +47,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Look for existing sessions and delete them
-	sessionDeleteQuery := "DELETE FROM sessions WHERE userId = ?"
+	sessionDeleteQuery := "DELETE FROM sessions WHERE userId = $1"
 
 	sessionDeleteExecErr := db.PrepareAndExecute(sessionDeleteQuery, userId)
 	if sessionDeleteExecErr != nil {
@@ -66,7 +66,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		Expires: expiresAt,
 	})
 
-	sessionsAddQuery := "INSERT INTO sessions (id, userId, createdAt, expiresAt) VALUES (?, ?, ?, ?)"
+	sessionsAddQuery := "INSERT INTO sessions (id, userId, createdAt, expiresAt) VALUES ($1, $2, $3, $4)"
 
 	sessionAddExecErr := db.PrepareAndExecute(sessionsAddQuery, sessionId, userId, createdAt, expiresAt)
 	if sessionAddExecErr != nil {

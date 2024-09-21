@@ -15,7 +15,7 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionId := cookie.Value
 
-	sessionDeleteQuery := "DELETE FROM sessions WHERE id = ?"
+	sessionDeleteQuery := "DELETE FROM sessions WHERE id = $1"
 
 	sessionDeleteExecErr := db.PrepareAndExecute(sessionDeleteQuery, sessionId)
 	if sessionDeleteExecErr != nil {

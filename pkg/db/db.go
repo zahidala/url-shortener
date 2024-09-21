@@ -7,7 +7,7 @@ import (
 	"sync"
 	Types "url-shortener/pkg/types"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 var instance *Types.Database
@@ -16,11 +16,14 @@ var once sync.Once
 // Init initializes the database connection
 func Init() {
 	once.Do(func() {
-		dbFile := "./database.sqlite3"
-		_, err := os.Stat(dbFile)
-		dbExists := !os.IsNotExist(err)
+		connStr := os.Getenv("DATABASE_URL")
 
-		conn, err := sql.Open("sqlite3", "./database.sqlite3")
+		if connStr == "" {
+			log.Fatal("DATABASE_URL environment variable not set")
+			return
+		}
+
+		conn, err := sql.Open("postgres", connStr)
 		if err != nil {
 			log.Fatalf("Error opening the database: %s", err)
 			return
@@ -31,18 +34,18 @@ func Init() {
 			return
 		}
 
-		if dbExists {
-			log.Println("Connected to the database")
-		}
+		// if dbExists {
+		log.Println("Connected to the database")
+		// }
 
 		instance = &Types.Database{
 			Conn: conn,
 		}
 
-		if !dbExists {
-			log.Println("Database file does not exist. Creating a new file and seeding database...")
-			seedDB()
-		}
+		// if !dbExists {
+		// 	log.Println("Database file does not exist. Creating a new file and seeding database...")
+		// 	seedDB()
+		// }
 	})
 }
 
@@ -50,32 +53,32 @@ func Init() {
 func seedDB() {
 	createTables := []string{
 		`CREATE TABLE Users (
-			id INTEGER PRIMARY KEY,
-			name TEXT NOT NULL,
-			username TEXT UNIQUE NOT NULL,
-			email TEXT UNIQUE NOT NULL,
-			password TEXT NOT NULL,
-			profilePicture TEXT
+				id SERIAL PRIMARY KEY,
+				name TEXT NOT NULL,
+				username TEXT UNIQUE NOT NULL,
+				email TEXT UNIQUE NOT NULL,
+				password TEXT NOT NULL,
+				profilePicture TEXT
 		);`,
 
 		`CREATE TABLE Sessions (
-			id TEXT PRIMARY KEY,
-			userId INTEGER NOT NULL,
-			data TEXT,
-			createdAt DATETIME NOT NULL,
-			expiresAt DATETIME NOT NULL,
-			FOREIGN KEY (userId) REFERENCES Users(id)
+				id TEXT PRIMARY KEY,
+				userId INTEGER NOT NULL,
+				data TEXT,
+				createdAt TIMESTAMP NOT NULL,
+				expiresAt TIMESTAMP NOT NULL,
+				FOREIGN KEY (userId) REFERENCES Users(id)
 		);`,
 
 		`CREATE TABLE Urls (
-			id INTEGER PRIMARY KEY AUTOINCREMENT, 
-			shortUrl TEXT NOT NULL, 
-			originalUrl TEXT NOT NULL, 
-			createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-			expiresAt DATETIME, 
-			clicks INTEGER DEFAULT 0, 
-			userId INTEGER, 
-			isActive BOOLEAN DEFAULT TRUE
+				id SERIAL PRIMARY KEY, 
+				shortUrl TEXT NOT NULL, 
+				originalUrl TEXT NOT NULL, 
+				createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+				expiresAt TIMESTAMP, 
+				clicks INTEGER DEFAULT 0, 
+				userId INTEGER, 
+				isActive BOOLEAN DEFAULT TRUE
 		);`,
 	}
 
@@ -92,11 +95,11 @@ func seedDB() {
 		`INSERT INTO Users (name, username, email, password, profilePicture) VALUES ('John Doe', 'johndoe', 'johndoe@gmail.com', '$2a$10$M9APgO1pJZgsfMdj9SmZEORF94WYnS5RkXrIaVA7ZG6bXgzSB5lEa', 'https://iili.io/dW44kLG.jpg');`,
 		`INSERT INTO Users (name, username, email, password, profilePicture) VALUES ('Jane Doe', 'janedoe', 'janedoe@gmail.com', '$2a$10$M9APgO1pJZgsfMdj9SmZEORF94WYnS5RkXrIaVA7ZG6bXgzSB5lEa', 'https://iili.io/dW44kLG.jpg');`,
 
-		`INSERT INTO urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/abc123', 'https://www.google.com', 1);`,
-		`INSERT INTO urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/xyz123', 'https://www.facebook.com', 2);`,
+		`INSERT INTO Urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/abc123', 'https://www.google.com', 1);`,
+		`INSERT INTO Urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/xyz123', 'https://www.facebook.com', 2);`,
 	}
 
-	// // Insert initial data
+	// Insert initial data
 	for _, query := range initialData {
 		if err := PrepareAndExecute(query); err != nil {
 			log.Println(query)

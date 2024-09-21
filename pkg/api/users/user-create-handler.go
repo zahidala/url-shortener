@@ -20,7 +20,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := "INSERT INTO users (name, username, email, password, profilePicture) VALUES (?, ?, ?, ?, 'https://iili.io/dW44kLG.jpg')"
+	query := "INSERT INTO users (name, username, email, password, profilePicture) VALUES ($1, $2, $3, $4, 'https://iili.io/dW44kLG.jpg')"
 
 	userAddExecErr := db.PrepareAndExecute(query,
 		name,

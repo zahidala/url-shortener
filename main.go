@@ -6,6 +6,8 @@ import (
 	"os"
 	"url-shortener/pkg/api/users"
 	"url-shortener/pkg/db"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {

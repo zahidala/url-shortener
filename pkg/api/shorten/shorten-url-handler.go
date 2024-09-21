@@ -18,7 +18,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 
 	user := utils.GetUserInfoBySession(w, r)
 
-	query := "INSERT INTO urls (shortUrl, originalUrl, userId) VALUES (?, ?, ?)"
+	query := "INSERT INTO urls (shortUrl, originalUrl, userId) VALUES ($1, $2, $3)"
 
 	shortUrlAddExecErr := db.PrepareAndExecute(query,
 		shortenURL,

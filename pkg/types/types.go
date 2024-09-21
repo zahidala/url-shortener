@@ -21,11 +21,11 @@ type User struct {
 }
 
 type Session struct {
-	ID        string
-	UserID    int
-	Data      string
-	CreatedAt time.Time
-	ExpiresAt time.Time
+	ID        string    `json:"id"`
+	UserID    int       `json:"userId"`
+	Data      string    `json:"data"`
+	CreatedAt time.Time `json:"createdAt"`
+	ExpiresAt time.Time `json:"expiresAt"`
 }
 
 type URL struct {

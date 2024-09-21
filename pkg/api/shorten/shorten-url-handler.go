@@ -4,12 +4,27 @@ import (
 	"net/http"
 	"url-shortener/pkg/db"
 	"url-shortener/pkg/utils"
+
+	UrlVerifier "github.com/davidmytton/url-verifier"
 )
 
 func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
 
 	if url == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	verifier := UrlVerifier.NewVerifier()
+	ret, err := verifier.Verify(url)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if !ret.IsURL {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

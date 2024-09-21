@@ -25,7 +25,7 @@ func AuthRequired(next http.Handler) http.Handler {
 			return
 		}
 
-		sessionsQuery := "SELECT expiresAt FROM sessions WHERE id = ?"
+		sessionsQuery := "SELECT expiresAt FROM sessions WHERE id = $1"
 		var expiresAtSession time.Time
 
 		sessionStmt, sessionErr := db.GetDB().Prepare(sessionsQuery)
@@ -44,7 +44,7 @@ func AuthRequired(next http.Handler) http.Handler {
 		}
 
 		if time.Now().After(expiresAtSession) {
-			deleteSessionQuery := "DELETE FROM sessions WHERE id = ?"
+			deleteSessionQuery := "DELETE FROM sessions WHERE id = $1"
 
 			sessionExecErr := db.PrepareAndExecute(deleteSessionQuery, cookie.Value)
 			if sessionExecErr != nil {
@@ -66,7 +66,7 @@ func AuthRequired(next http.Handler) http.Handler {
 		// check if user has more than one session
 		// if so, delete all sessions except the current one
 
-		moreThanOneSessionQuery := "SELECT userId FROM sessions WHERE id = ?"
+		moreThanOneSessionQuery := "SELECT userId FROM sessions WHERE id = $1"
 		var userId int
 
 		moreThanOneSessionStmt, moreThanOneSessionError := db.GetDB().Prepare(moreThanOneSessionQuery)
@@ -87,7 +87,7 @@ func AuthRequired(next http.Handler) http.Handler {
 
 		// delete all sessions except the current one
 
-		deleteAllSessionsQuery := "DELETE FROM sessions WHERE userId = ? AND id != ?"
+		deleteAllSessionsQuery := "DELETE FROM sessions WHERE userId = $1 AND id != $2"
 
 		deleteAllSessionsExecErr := db.PrepareAndExecute(deleteAllSessionsQuery, userId, cookie.Value)
 		if deleteAllSessionsExecErr != nil {

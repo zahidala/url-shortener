@@ -61,7 +61,7 @@ func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
 
 	sessionId := cookie.Value
 
-	sessionsQuery := "SELECT userId FROM sessions WHERE id = ?"
+	sessionsQuery := "SELECT userId FROM sessions WHERE id = $1"
 
 	sessionStmt, sessionErr := db.GetDB().Prepare(sessionsQuery)
 	if sessionErr != nil {
@@ -79,7 +79,7 @@ func GetUserInfoBySession(w http.ResponseWriter, r *http.Request) Types.User {
 		return Types.User{}
 	}
 
-	userQuery := "SELECT * FROM users WHERE id = ?"
+	userQuery := "SELECT * FROM users WHERE id = $1"
 
 	userStmt, userErr := db.GetDB().Prepare(userQuery)
 

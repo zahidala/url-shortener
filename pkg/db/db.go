@@ -95,8 +95,8 @@ func seedDB() {
 		`INSERT INTO Users (name, username, email, password, profilePicture) VALUES ('John Doe', 'johndoe', 'johndoe@gmail.com', '$2a$10$M9APgO1pJZgsfMdj9SmZEORF94WYnS5RkXrIaVA7ZG6bXgzSB5lEa', 'https://iili.io/dW44kLG.jpg');`,
 		`INSERT INTO Users (name, username, email, password, profilePicture) VALUES ('Jane Doe', 'janedoe', 'janedoe@gmail.com', '$2a$10$M9APgO1pJZgsfMdj9SmZEORF94WYnS5RkXrIaVA7ZG6bXgzSB5lEa', 'https://iili.io/dW44kLG.jpg');`,
 
-		`INSERT INTO Urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/abc123', 'https://www.google.com', 1);`,
-		`INSERT INTO Urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/xyz123', 'https://www.facebook.com', 2);`,
+		// `INSERT INTO Urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/abc123', 'https://www.google.com', 1);`,
+		// `INSERT INTO Urls (shortUrl, originalUrl, userId) VALUES ('http://localhost:8080/xyz123', 'https://www.facebook.com', 2);`,
 	}
 
 	// Insert initial data
